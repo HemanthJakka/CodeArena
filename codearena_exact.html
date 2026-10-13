@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeArena - Vowel or Consonant</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; color: #fff; min-height: 100vh; }
+        .main-container { display: flex; padding: 20px; gap: 20px; min-height: 100vh; }
+        .panel { flex: 1; background: #fff; border-radius: 12px; overflow: hidden; color: #333; display: flex; flex-direction: column; }
+        .left-panel { flex: 1; background: #fff; border-radius: 12px; overflow: hidden; color: #333; }
+        .tabs { display: flex; border-bottom: 2px solid #eee; }
+        .tab { padding: 15px 25px; cursor: pointer; font-weight: 500; color: #666; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.3s; }
+        .tab:hover { color: #333; }
+        .tab.active { color: #1e40af; border-bottom-color: #1e40af; }
+        .problem-content { padding: 25px; overflow-y: auto; max-height: calc(100vh - 120px); }
+        .problem-description { font-size: 16px; line-height: 1.8; color: #444; margin-bottom: 25px; }
+        .complexity-box { background: #f0f4ff; border: 1px solid #dbeafe; border-radius: 8px; padding: 20px; margin-bottom: 25px; }
+        .complexity-box p { margin: 8px 0; color: #555; }
+        .complexity-box span { background: #fff; padding: 3px 10px; border-radius: 4px; font-family: monospace; color: #1e40af; font-weight: 600; }
+        .section-title { font-size: 18px; font-weight: 700; color: #333; margin-bottom: 15px; }
+        .sample-box { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 15px 20px; margin-bottom: 20px; font-family: monospace; font-size: 16px; color: #333; }
+        .constraints { background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 15px 20px; }
+        .constraints h4 { color: #856404; margin-bottom: 10px; }
+        .constraints ul { color: #856404; margin-left: 20px; }
+        .right-panel { flex: 1; display: flex; flex-direction: column; gap: 20px; }
+        .editor-container { background: #fff; border-radius: 12px; overflow: hidden; flex: 1; }
+        .editor-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid #eee; }
+        .editor-controls { display: flex; gap: 15px; align-items: center; }
+        .control-group { display: flex; align-items: center; gap: 8px; }
+        .control-label { font-size: 12px; color: #666; font-weight: 600; }
+        select { padding: 6px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; background: #fff; cursor: pointer; }
+        .font-controls { display: flex; align-items: center; gap: 5px; }
+        .font-btn { background: #f0f0f0; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 14px; }
+        .font-btn:hover { background: #e0e0e0; }
+        .font-size-display { padding: 5px 10px; background: #f0f0f0; border-radius: 4px; font-size: 13px; }
+        .action-buttons { display: flex; gap: 10px; }
+        .btn { padding: 8px 20px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+        .btn-reset { background: #dc3545; color: white; }
+        .btn-reset:hover { background: #c82333; }
+        .btn-run { background: #6c757d; color: white; }
+        .btn-run:hover { background: #5a6268; }
+        .btn-submit { background: #2563eb; color: white; }
+        .btn-submit:hover { background: #1d4ed8; }
+        .code-editor { position: relative; background: #fff; min-height: 300px; border: 1px solid #eee; border-radius: 8px; margin: 15px; }
+        .line-numbers { position: absolute; left: 0; top: 0; bottom: 0; width: 50px; background: #f8f9fa; padding: 15px 0; text-align: right; user-select: none; border-right: 1px solid #eee; }
+        .line-number { padding: 0 10px; color: #999; font-family: 'Consolas', monospace; font-size: 14px; line-height: 1.5; }
+        .code-input { width: 100%; min-height: 300px; padding: 15px 15px 15px 60px; background: #fff; color: #333; border: none; font-family: 'Consolas', monospace; font-size: 14px; line-height: 1.5; resize: vertical; outline: none; tab-size: 4; border-radius: 8px; }
+        .code-input::placeholder { color: #6a9955; }
+        .testcases-panel { background: #fff; border-radius: 12px; overflow: hidden; flex: 1; }
+        .testcases-header { display: flex; align-items: center; padding: 12px 20px; background: #f5f5f5; border-bottom: 1px solid #ddd; }
+        .window-dots { display: flex; gap: 8px; margin-right: 20px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot.red { background: #ff5f56; }
+        .dot.yellow { background: #ffbd2e; }
+        .dot.green { background: #27c93f; }
+        .testcase-tabs { display: flex; gap: 20px; }
+        .testcase-tab { color: #858585; font-size: 12px; font-weight: 600; cursor: pointer; padding: 5px 0; }
+        .testcase-tab.active { color: #fff; border-bottom: 2px solid #007acc; }
+        .terminal-label { margin-left: auto; color: #569cd6; font-size: 12px; }
+        .testcases-content { padding: 20px; font-family: 'Consolas', monospace; font-size: 14px; line-height: 1.8; background: #fff; color: #333; }
+        .terminal-prompt { color: #27ae60; }
+        .terminal-command { color: #333; }
+        .terminal-output { color: #1e40af; }
+        .terminal-label-output { color: #1e40af; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f0f0f0; }
+        ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #aaa; }
+        @media (max-width: 1200px) { .main-container { flex-direction: column; } }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="left-panel">
+            <div class="tabs">
+                <div class="tab active">Problem</div>
+                <div class="tab">Submissions</div>
+                <div class="tab">Leaderboard</div>
+                <div class="tab">Hints</div>
+                <div class="tab">Editorial</div>
+            </div>
+            <div class="problem-content">
+                <p class="problem-description">Read a single character. Print 'VOWEL' if it is a vowel (case-insensitive), otherwise print 'CONSONANT'.</p>
+                <div class="complexity-box">
+                    <p>Expected Time Complexity: <span>O(N)</span></p>
+                    <p>Expected Space Complexity: <span>O(1)</span></p>
+                </div>
+                <h3 class="section-title">Sample Input</h3>
+                <div class="sample-box">a</div>
+                <h3 class="section-title">Sample Output</h3>
+                <div class="sample-box">VOWEL</div>
+                <div class="constraints">
+                    <h4>Constraints</h4>
+                    <ul>
+                        <li>Input is a single character</li>
+                        <li>Can be uppercase or lowercase</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="right-panel">
+            <div class="editor-container">
+                <div class="editor-header">
+                    <div class="editor-controls">
+                        <div class="control-group">
+                            <span class="control-label">LANGUAGE</span>
+                            <select><option>Python 3</option><option>C++</option><option>Java</option></select>
+                        </div>
+                        <div class="control-group">
+                            <span class="control-label">THEME</span>
+                            <select><option>Light</option><option>Dark</option></select>
+                        </div>
+                        <div class="font-controls">
+                            <button class="font-btn" onclick="changeFontSize(-1)">A-</button>
+                            <span class="font-size-display" id="fontSizeDisplay">14px</span>
+                            <button class="font-btn" onclick="changeFontSize(1)">A+</button>
+                        </div>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn btn-reset" onclick="resetCode()">Reset</button>
+                        <button class="btn btn-run" onclick="runCode()">Run</button>
+                        <button class="btn btn-submit" onclick="submitCode()">Submit</button>
+                    </div>
+                </div>
+                <div class="code-editor">
+                    <div class="line-numbers" id="lineNumbers"></div>
+                    <textarea class="code-input" id="codeInput" spellcheck="false"># Write your Python 3 solution here.
+import sys
+
+def solve():
+    pass
+
+if __name__ == '__main__':
+    solve()</textarea>
+                </div>
+            </div>
+            <div class="testcases-panel">
+                <div class="testcases-header">
+                    <div class="window-dots">
+                        <div class="dot red"></div>
+                        <div class="dot yellow"></div>
+                        <div class="dot green"></div>
+                    </div>
+                    <div class="testcase-tabs">
+                        <div class="testcase-tab active">TESTCASES</div>
+                        <div class="testcase-tab">VERDICT LOGS</div>
+                    </div>
+                    <div class="terminal-label">CODEARENA SANDBOX TERMINAL</div>
+                </div>
+                <div class="testcases-content">
+                    <div><span class="terminal-prompt">$</span> <span class="terminal-command">cat sample_testcases.json</span></div>
+                    <br>
+                    <div><span class="terminal-label-output">[Sample Input]</span></div>
+                    <div class="terminal-output">a</div>
+                    <br>
+                    <div><span class="terminal-label-output">[Sample Expected Output]</span></div>
+                    <div class="terminal-output">VOWEL</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function updateLineNumbers() {
+            const codeInput = document.getElementById('codeInput');
+            const lineNumbers = document.getElementById('lineNumbers');
+            const lines = codeInput.value.split('\n').length;
+            let html = '';
+            for (let i = 1; i <= lines; i++) { html += '<div class="line-number">' + i + '</div>'; }
+            lineNumbers.innerHTML = html;
+        }
+        let fontSize = 14;
+        function changeFontSize(delta) {
+            fontSize = Math.max(10, Math.min(24, fontSize + delta));
+            document.getElementById('fontSizeDisplay').textContent = fontSize + 'px';
+            document.getElementById('codeInput').style.fontSize = fontSize + 'px';
+        }
+        function resetCode() {
+            document.getElementById('codeInput').value = "# Write your Python 3 solution here.\nimport sys\n\ndef solve():\n    pass\n\nif __name__ == '__main__':\n    solve()";
+            updateLineNumbers();
+        }
+        function runCode() { alert('Running code...'); }
+        function submitCode() { alert('Submitting code...'); }
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+        document.querySelectorAll('.testcase-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.testcase-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+        document.getElementById('codeInput').addEventListener('input', updateLineNumbers);
+        document.getElementById('codeInput').addEventListener('scroll', function() {
+            document.getElementById('lineNumbers').scrollTop = this.scrollTop;
+        });
+        updateLineNumbers();
+    </script>
+</body>
+</html>

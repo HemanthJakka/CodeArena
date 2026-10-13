@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pattern Printer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1a5276 0%, #2e86c1 100%);
+            color: white;
+            padding: 20px 30px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .question-box {
+            background: #e8f4f8;
+            border-left: 4px solid #3498db;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+
+        .question-box h2 {
+            font-size: 18px;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .question-box p {
+            color: #555;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .example-section {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .example-section h3 {
+            font-size: 16px;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .example-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .example-table th,
+        .example-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .example-table th {
+            background: #3498db;
+            color: white;
+            font-weight: 600;
+        }
+
+        .example-table td {
+            background: white;
+        }
+
+        .pattern-output {
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.4;
+            white-space: pre;
+            color: #333;
+        }
+
+        .input-section {
+            margin-bottom: 25px;
+        }
+
+        .input-section label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-group input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(39, 174, 96, 0.4);
+        }
+
+        .result-section {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .result-section h3 {
+            font-size: 16px;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .result-box {
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 150px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            white-space: pre;
+            overflow-x: auto;
+        }
+
+        .result-box.has-content {
+            border-color: #27ae60;
+            background: #f0fff4;
+        }
+
+        .test-cases {
+            margin-top: 25px;
+            padding: 20px;
+            background: #fff3cd;
+            border-radius: 8px;
+        }
+
+        .test-cases h4 {
+            color: #856404;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .test-cases ul {
+            list-style: none;
+            font-size: 13px;
+            color: #856404;
+        }
+
+        .test-cases li {
+            padding: 5px 0;
+            border-bottom: 1px dashed #ffc107;
+        }
+
+        .test-cases li:last-child {
+            border-bottom: none;
+        }
+
+        .code-section {
+            margin-top: 25px;
+            padding: 20px;
+            background: #2d2d2d;
+            border-radius: 8px;
+        }
+
+        .code-section h4 {
+            color: #f8f8f2;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .code-block {
+            background: #1e1e1e;
+            border-radius: 6px;
+            padding: 15px;
+            overflow-x: auto;
+        }
+
+        .code-block pre {
+            margin: 0;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #f8f8f2;
+        }
+
+        .code-block .keyword {
+            color: #ff79c6;
+        }
+
+        .code-block .function {
+            color: #50fa7b;
+        }
+
+        .code-block .string {
+            color: #f1fa8c;
+        }
+
+        .code-block .number {
+            color: #bd93f9;
+        }
+
+        .code-block .comment {
+            color: #6272a4;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Pattern Printer</h1>
+            <p>Question 2 - Programming Challenge</p>
+        </div>
+
+        <div class="content">
+            <div class="question-box">
+                <h2>Question</h2>
+                <p>Write a program to print the current pattern based on the input number.</p>
+            </div>
+
+            <div class="example-section">
+                <h3>Examples</h3>
+                <table class="example-table">
+                    <thead>
+                        <tr>
+                            <th>Input</th>
+                            <th>Result</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>3</strong></td>
+                            <td>
+                                <div class="pattern-output">1
+1 1
+1 1 1</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>5</strong></td>
+                            <td>
+                                <div class="pattern-output">1
+1 1
+1 1 1
+1 1 1 1
+1 1 1 1 1</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="input-section">
+                <label for="numberInput">Enter a number:</label>
+                <div class="input-group">
+                    <input type="number" id="numberInput" min="1" max="50" placeholder="Enter number (1-50)">
+                    <button class="btn btn-primary" onclick="generatePattern()">Generate</button>
+                </div>
+            </div>
+
+            <div class="result-section">
+                <h3>Result</h3>
+                <div class="result-box" id="resultBox">Enter a number and click Generate to see the pattern...</div>
+            </div>
+
+            <div class="test-cases">
+                <h4>Test Cases</h4>
+                <ul>
+                    <li>Input: 1 → Output: 1</li>
+                    <li>Input: 3 → Output: 1, 1 1, 1 1 1</li>
+                    <li>Input: 5 → Output: 1, 1 1, 1 1 1, 1 1 1 1, 1 1 1 1 1</li>
+                    <li>Input: 7 → Output: 7 rows of increasing 1s</li>
+                </ul>
+            </div>
+
+            <div class="code-section">
+                <h4>Python Code</h4>
+                <div class="code-block">
+                    <pre><span class="keyword">def</span> <span class="function">print_pattern</span>(n):
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(<span class="number">1</span>, n + <span class="number">1</span>):
+        <span class="function">print</span>(<span class="string">' '</span>.<span class="function">join</span>([<span class="string">'1'</span>] * i))
+
+n = <span class="function">int</span>(<span class="function">input</span>())
+<span class="function">print_pattern</span>(n)</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function generatePattern() {
+            const input = document.getElementById('numberInput');
+            const resultBox = document.getElementById('resultBox');
+            const n = parseInt(input.value);
+
+            if (isNaN(n) || n < 1 || n > 50) {
+                resultBox.textContent = 'Please enter a valid number between 1 and 50';
+                resultBox.classList.remove('has-content');
+                return;
+            }
+
+            let pattern = '';
+            for (let i = 1; i <= n; i++) {
+                pattern += '1 '.repeat(i).trim();
+                if (i < n) pattern += '\n';
+            }
+
+            resultBox.textContent = pattern;
+            resultBox.classList.add('has-content');
+        }
+
+        document.getElementById('numberInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                generatePattern();
+            }
+        });
+    </script>
+</body>
+</html>

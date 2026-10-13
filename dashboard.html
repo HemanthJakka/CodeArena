@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Problem Set</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #1a1a1a; color: #fff; height: 100vh; overflow: hidden; }
+        .sidebar { width: 250px; height: 100vh; background: #262626; position: fixed; left: 0; top: 0; border-right: 1px solid #333; display: flex; flex-direction: column; }
+        .sidebar-header { padding: 20px; border-bottom: 1px solid #333; }
+        .logo { font-size: 24px; font-weight: 700; color: #ffa116; }
+        .sidebar-nav { flex: 1; padding: 15px 0; overflow-y: auto; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 20px; color: #999; cursor: pointer; transition: all 0.3s; }
+        .nav-item:hover { background: #333; color: #fff; }
+        .nav-item.active { background: #333; color: #ffa116; border-right: 3px solid #ffa116; }
+        .nav-icon { font-size: 18px; }
+        .nav-text { font-size: 14px; }
+        .nav-badge { margin-left: auto; background: #ffa116; color: #000; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+        .main-content { margin-left: 250px; height: 100vh; display: flex; flex-direction: column; }
+        .top-bar { background: #262626; padding: 15px 25px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+        .search-box { display: flex; align-items: center; background: #333; border-radius: 8px; padding: 10px 15px; width: 400px; }
+        .search-box input { background: none; border: none; color: #fff; font-size: 14px; width: 100%; outline: none; }
+        .search-box input::placeholder { color: #666; }
+        .user-profile { display: flex; align-items: center; gap: 10px; }
+        .avatar { width: 35px; height: 35px; background: #ffa116; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #000; }
+        .filter-bar { padding: 15px 25px; background: #1f1f1f; border-bottom: 1px solid #333; display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
+        .filter-group { display: flex; align-items: center; gap: 8px; }
+        .filter-label { font-size: 12px; color: #999; }
+        .filter-btn { padding: 6px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; border: 1px solid #444; background: #333; color: #999; transition: all 0.3s; }
+        .filter-btn:hover { border-color: #ffa116; color: #ffa116; }
+        .filter-btn.active { background: #ffa116; color: #000; border-color: #ffa116; }
+        .stats-row { padding: 15px 25px; display: flex; gap: 20px; background: #1a1a1a; border-bottom: 1px solid #333; }
+        .stat-card { background: #262626; border-radius: 8px; padding: 15px 20px; flex: 1; }
+        .stat-card-label { font-size: 12px; color: #999; margin-bottom: 5px; }
+        .stat-card-value { font-size: 20px; font-weight: 700; }
+        .stat-card-value.green { color: #34d399; }
+        .stat-card-value.yellow { color: #fbbf24; }
+        .stat-card-value.red { color: #f87171; }
+        .stat-card-value.blue { color: #60a5fa; }
+        .problem-table-container { flex: 1; overflow-y: auto; padding: 0 25px 25px 25px; }
+        .problem-table { width: 100%; border-collapse: collapse; }
+        .problem-table thead { position: sticky; top: 0; background: #1a1a1a; z-index: 10; }
+        .problem-table th { padding: 12px 15px; text-align: left; font-size: 12px; color: #999; border-bottom: 1px solid #333; font-weight: 600; }
+        .problem-table td { padding: 15px; border-bottom: 1px solid #262626; font-size: 14px; }
+        .problem-table tbody tr { cursor: pointer; transition: background 0.2s; }
+        .problem-table tbody tr:hover { background: #262626; }
+        .status-icon { width: 18px; height: 18px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; }
+        .status-solved { background: #2d6a2e; color: #34d399; }
+        .status-attempted { background: #444; color: #999; }
+        .problem-id { color: #999; }
+        .problem-title-link { color: #fff; text-decoration: none; }
+        .problem-title-link:hover { color: #ffa116; }
+        .difficulty-badge { padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+        .difficulty-easy { background: #0d3b2e; color: #34d399; }
+        .difficulty-medium { background: #3b2e0d; color: #fbbf24; }
+        .difficulty-hard { background: #3b0d0d; color: #f87171; }
+        .acceptance-rate { color: #999; }
+        .problem-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+        .mini-tag { background: #333; color: #999; padding: 2px 8px; border-radius: 4px; font-size: 11px; }
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 8px; padding: 20px; }
+        .page-btn { padding: 8px 14px; border-radius: 6px; border: 1px solid #444; background: #262626; color: #999; cursor: pointer; font-size: 13px; transition: all 0.3s; }
+        .page-btn:hover { border-color: #ffa116; color: #ffa116; }
+        .page-btn.active { background: #ffa116; color: #000; border-color: #ffa116; }
+        .scroll-top { position: fixed; bottom: 30px; right: 30px; width: 45px; height: 45px; background: #ffa116; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(255,161,22,0.4); opacity: 0; visibility: hidden; transition: all 0.3s; z-index: 100; font-size: 20px; color: #000; }
+        .scroll-top.visible { opacity: 1; visibility: visible; }
+        .scroll-top:hover { transform: translateY(-3px); }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #1a1a1a; }
+        ::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
+        @media (max-width: 1200px) { .sidebar { width: 70px; } .nav-text, .nav-badge { display: none; } .nav-item { justify-content: center; padding: 15px; } .main-content { margin-left: 70px; } .search-box { width: 250px; } }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header"><div class="logo">LeetPro</div></div>
+        <div class="sidebar-nav">
+            <div class="nav-item active"><span class="nav-icon">&#128221;</span><span class="nav-text">Problems</span><span class="nav-badge">2500+</span></div>
+            <div class="nav-item"><span class="nav-icon">&#127942;</span><span class="nav-text">Contest</span></div>
+            <div class="nav-item"><span class="nav-icon">&#128172;</span><span class="nav-text">Discuss</span></div>
+            <div class="nav-item"><span class="nav-icon">&#128218;</span><span class="nav-text">Study Plan</span></div>
+            <div class="nav-item"><span class="nav-icon">&#128202;</span><span class="nav-text">Progress</span></div>
+            <div class="nav-item"><span class="nav-icon">&#9881;</span><span class="nav-text">Settings</span></div>
+        </div>
+    </div>
+    <div class="main-content">
+        <div class="top-bar">
+            <div class="search-box"><input type="text" placeholder="Search problems by title or ID..." id="searchInput" oninput="searchProblems()"></div>
+            <div class="user-profile"><span style="color:#999;font-size:14px;">15 day streak</span><div class="avatar">A</div></div>
+        </div>
+        <div class="filter-bar">
+            <div class="filter-group">
+                <span class="filter-label">Status:</span>
+                <button class="filter-btn active" onclick="filterProblems('all',this)">All</button>
+                <button class="filter-btn" onclick="filterProblems('solved',this)">Solved</button>
+                <button class="filter-btn" onclick="filterProblems('unsolved',this)">Unsolved</button>
+            </div>
+            <div class="filter-group">
+                <span class="filter-label">Difficulty:</span>
+                <button class="filter-btn active" onclick="filterDifficulty('all',this)">All</button>
+                <button class="filter-btn" onclick="filterDifficulty('easy',this)">Easy</button>
+                <button class="filter-btn" onclick="filterDifficulty('medium',this)">Medium</button>
+                <button class="filter-btn" onclick="filterDifficulty('hard',this)">Hard</button>
+            </div>
+        </div>
+        <div class="stats-row">
+            <div class="stat-card"><div class="stat-card-label">Total Problems</div><div class="stat-card-value blue">2,500</div></div>
+            <div class="stat-card"><div class="stat-card-label">Easy</div><div class="stat-card-value green">650</div></div>
+            <div class="stat-card"><div class="stat-card-label">Medium</div><div class="stat-card-value yellow">1,200</div></div>
+            <div class="stat-card"><div class="stat-card-label">Hard</div><div class="stat-card-value red">650</div></div>
+        </div>
+        <div class="problem-table-container" id="problemTable">
+            <table class="problem-table">
+                <thead><tr><th style="width:50px;">Status</th><th style="width:70px;">ID</th><th>Title</th><th style="width:100px;">Difficulty</th><th style="width:100px;">Acceptance</th><th>Tags</th></tr></thead>
+                <tbody id="problemList"></tbody>
+            </table>
+            <div class="pagination" id="pagination"></div>
+        </div>
+    </div>
+    <div class="scroll-top" id="scrollTop" onclick="scrollToTop()">&#8593;</div>
+    <script>
+        const problems = [
+            {id:1,title:"Two Sum",difficulty:"easy",acceptance:"57.9%",solved:true,tags:["Array","Hash Table"]},
+            {id:2,title:"Add Two Numbers",difficulty:"medium",acceptance:"42.1%",solved:true,tags:["Linked List","Math"]},
+            {id:3,title:"Longest Substring Without Repeating Characters",difficulty:"medium",acceptance:"34.8%",solved:false,tags:["String","Sliding Window"]},
+            {id:4,title:"Median of Two Sorted Arrays",difficulty:"hard",acceptance:"35.2%",solved:false,tags:["Array","Binary Search"]},
+            {id:5,title:"Longest Palindromic Substring",difficulty:"medium",acceptance:"33.8%",solved:true,tags:["String","DP"]},
+            {id:6,title:"Reverse Integer",difficulty:"medium",acceptance:"28.5%",solved:false,tags:["Math"]},
+            {id:7,title:"String to Integer (atoi)",difficulty:"medium",acceptance:"18.2%",solved:false,tags:["String","Math"]},
+            {id:8,title:"Palindrome Number",difficulty:"easy",acceptance:"54.2%",solved:true,tags:["Math"]},
+            {id:9,title:"Regular Expression Matching",difficulty:"hard",acceptance:"28.9%",solved:false,tags:["String","DP"]},
+            {id:10,title:"Container With Most Water",difficulty:"medium",acceptance:"54.6%",solved:true,tags:["Array","Two Pointers"]},
+            {id:11,title:"Roman to Integer",difficulty:"easy",acceptance:"58.3%",solved:false,tags:["String","Math"]},
+            {id:12,title:"Longest Common Prefix",difficulty:"easy",acceptance:"41.2%",solved:false,tags:["String"]},
+            {id:13,title:"3Sum",difficulty:"medium",acceptance:"32.8%",solved:true,tags:["Array","Two Pointers"]},
+            {id:14,title:"Letter Combinations of a Phone Number",difficulty:"medium",acceptance:"56.7%",solved:false,tags:["String","Backtracking"]},
+            {id:15,title:"4Sum",difficulty:"medium",acceptance:"36.4%",solved:false,tags:["Array","Two Pointers"]},
+            {id:16,title:"Remove Duplicates from Sorted Array",difficulty:"easy",acceptance:"54.8%",solved:true,tags:["Array","Two Pointers"]},
+            {id:17,title:"Search in Rotated Sorted Array",difficulty:"medium",acceptance:"39.8%",solved:false,tags:["Array","Binary Search"]},
+            {id:18,title:"Find First and Last Position of Element in Sorted Array",difficulty:"medium",acceptance:"42.3%",solved:false,tags:["Array","Binary Search"]},
+            {id:19,title:"Combination Sum",difficulty:"medium",acceptance:"68.2%",solved:true,tags:["Array","Backtracking"]},
+            {id:20,title:"Valid Parentheses",difficulty:"easy",acceptance:"40.7%",solved:true,tags:["String","Stack"]},
+            {id:21,title:"Merge Two Sorted Lists",difficulty:"easy",acceptance:"63.4%",solved:false,tags:["Linked List","Recursion"]},
+            {id:22,title:"Generate Parentheses",difficulty:"medium",acceptance:"73.1%",solved:false,tags:["String","Backtracking"]},
+            {id:23,title:"Merge k Sorted Lists",difficulty:"hard",acceptance:"51.0%",solved:false,tags:["Linked List","Heap"]},
+            {id:24,title:"Best Time to Buy and Sell Stock",difficulty:"easy",acceptance:"54.2%",solved:true,tags:["Array","DP"]},
+            {id:25,title:"Climbing Stairs",difficulty:"easy",acceptance:"52.3%",solved:true,tags:["Math","DP"]},
+            {id:26,title:"Maximum Subarray",difficulty:"medium",acceptance:"50.3%",solved:true,tags:["Array","DP"]},
+            {id:27,title:"Jump Game",difficulty:"medium",acceptance:"38.9%",solved:false,tags:["Array","Greedy"]},
+            {id:28,title:"Course Schedule",difficulty:"medium",acceptance:"45.7%",solved:false,tags:["Graph","Topological Sort"]},
+            {id:29,title:"Number of Islands",difficulty:"medium",acceptance:"57.8%",solved:true,tags:["Graph","DFS"]},
+            {id:30,title:"Coin Change",difficulty:"medium",acceptance:"42.5%",solved:false,tags:["Array","DP"]}
+        ];
+        let currentStatus = 'all';
+        let currentDifficulty = 'all';
+        let currentPage = 1;
+        const perPage = 10;
+        function getFiltered() {
+            return problems.filter(p => {
+                if (currentStatus === 'solved' && !p.solved) return false;
+                if (currentStatus === 'unsolved' && p.solved) return false;
+                if (currentDifficulty !== 'all' && p.difficulty !== currentDifficulty) return false;
+                const q = document.getElementById('searchInput').value.toLowerCase();
+                if (q && !p.title.toLowerCase().includes(q) && !String(p.id).includes(q)) return false;
+                return true;
+            });
+        }
+        function render() {
+            const filtered = getFiltered();
+            const totalPages = Math.ceil(filtered.length / perPage);
+            const start = (currentPage - 1) * perPage;
+            const pageItems = filtered.slice(start, start + perPage);
+            let html = '';
+            pageItems.forEach(p => {
+                const diffClass = 'difficulty-' + p.difficulty;
+                const statusHtml = p.solved ? '<span class="status-icon status-solved">&#10003;</span>' : '<span class="status-icon status-attempted">&nbsp;</span>';
+                const tagsHtml = p.tags.map(t => '<span class="mini-tag">' + t + '</span>').join('');
+                html += '<tr onclick="openProblem(' + p.id + ')">';
+                html += '<td>' + statusHtml + '</td>';
+                html += '<td class="problem-id">' + p.id + '</td>';
+                html += '<td><a class="problem-title-link">' + p.title + '</a></td>';
+                html += '<td><span class="difficulty-badge ' + diffClass + '">' + p.difficulty.charAt(0).toUpperCase() + p.difficulty.slice(1) + '</span></td>';
+                html += '<td class="acceptance-rate">' + p.acceptance + '</td>';
+                html += '<td><div class="problem-tags">' + tagsHtml + '</div></td>';
+                html += '</tr>';
+            });
+            document.getElementById('problemList').innerHTML = html;
+            let pagHtml = '<button class="page-btn" onclick="changePage(' + Math.max(1, currentPage - 1) + ')">&#8592; Prev</button>';
+            for (let i = 1; i <= totalPages; i++) {
+                pagHtml += '<button class="page-btn' + (i === currentPage ? ' active' : '') + '" onclick="changePage(' + i + ')">' + i + '</button>';
+            }
+            pagHtml += '<button class="page-btn" onclick="changePage(' + Math.min(totalPages, currentPage + 1) + ')">Next &#8594;</button>';
+            document.getElementById('pagination').innerHTML = pagHtml;
+        }
+        function filterProblems(status, btn) {
+            currentStatus = status;
+            currentPage = 1;
+            btn.parentElement.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            render();
+        }
+        function filterDifficulty(diff, btn) {
+            currentDifficulty = diff;
+            currentPage = 1;
+            btn.parentElement.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            render();
+        }
+        function searchProblems() {
+            currentPage = 1;
+            render();
+        }
+        function changePage(page) {
+            currentPage = page;
+            render();
+            document.getElementById('problemTable').scrollTop = 0;
+        }
+        function openProblem(id) {
+            alert('Opening Problem #' + id);
+        }
+        const tableContainer = document.getElementById('problemTable');
+        tableContainer.addEventListener('scroll', function() {
+            const btn = document.getElementById('scrollTop');
+            if (this.scrollTop > 300) { btn.classList.add('visible'); } else { btn.classList.remove('visible'); }
+        });
+        function scrollToTop() {
+            document.getElementById('problemTable').scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        render();
+    </script>
+</body>
+</html>
